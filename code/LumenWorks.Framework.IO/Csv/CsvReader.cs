@@ -2118,8 +2118,19 @@ namespace LumenWorks.Framework.IO.Csv
 		{
 			get
 			{
-				ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-				return this[name];
+                if (string.IsNullOrEmpty(name))
+                    throw new ArgumentNullException("name");
+
+                if (!_hasHeaders)
+                    throw new InvalidOperationException(ExceptionMessage.NoHeaders);
+
+                int index = GetFieldIndex(name);
+
+                if (index < 0)
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, ExceptionMessage.FieldHeaderNotFound, name), "name");
+
+                ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
+                return FieldValue(index);
 			}
 		}
 
