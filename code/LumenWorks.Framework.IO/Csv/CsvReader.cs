@@ -1575,7 +1575,7 @@ namespace LumenWorks.Framework.IO.Csv
 					_firstRecordInCache = false;
 
 					_fieldHeaders = new string[_fieldCount];
-					_fieldHeaderIndexes = new Dictionary<string, int>(_fieldCount, _fieldHeaderComparer);
+					_fieldHeaderIndexes = new Dictionary<string, int>(_fieldCount/*, _fieldHeaderComparer*/);
 
 					for (int i = 0; i < _fields.Length; i++)
 					{
