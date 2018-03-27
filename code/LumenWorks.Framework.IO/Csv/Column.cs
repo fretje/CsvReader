@@ -1,22 +1,21 @@
 ﻿namespace LumenWorks.Framework.IO.Csv
 {
     using System;
+    using System.Globalization;
 
     /// <summary>
     /// Metadata about a CSV column.
     /// </summary>
     public class Column
     {
-        private Type type;
-        private string typeName;
+        private Type _type;
+        private string _typeName;
 
         /// <summary>
         /// Creates a new instance of the <see cref="Column" /> class.
         /// </summary>
-        public Column()
-        {
+        public Column() => 
             Type = typeof(string);
-        }
 
         /// <summary>
         /// Get or set the name.
@@ -28,11 +27,11 @@
         /// </summary>
         public Type Type
         {
-            get { return type; }
+            get => _type;
             set
             {
-                this.type = value;
-                typeName = value.Name;
+                _type = value;
+                _typeName = value.Name;
             }
         }
 
@@ -40,11 +39,21 @@
         /// Converts the value into the column type.
         /// </summary>
         /// <param name="value">Value to use</param>
+        /// <param name="provider">FormatProvider to use</param>
         /// <returns>Converted value.</returns>
-        public object Convert(string value)
+        public object Convert(string value, IFormatProvider provider = null) =>
+            Convert(value, NumberStyles.Number, provider);
+
+        /// <summary>
+        /// Converts the value into the column type.
+        /// </summary>
+        /// <param name="value">Value to use</param>
+        /// <param name="styles">NumberStyles to use.</param>
+        /// <param name="provider">FormatProvider to use.</param>
+        /// <returns>Converted value.</returns>
+        public object Convert(string value, NumberStyles styles, IFormatProvider provider)
         {
-            object x;
-            TryConvert(value, out x);
+            TryConvert(value, styles, provider, out var x);
 
             return x;
         }
@@ -52,14 +61,16 @@
         /// <summary>
         /// Converts the value into the column type.
         /// </summary>
-        /// <param name="value">Value to use</param>
+        /// <param name="value">Value to use.</param>
+        /// <param name="styles">NumberStyles to use.</param>
+        /// <param name="provider">FormatProvider to use.</param>
         /// <param name="result">Object to hold the converted value.</param>
         /// <returns>true if the conversion was successful, otherwise false.</returns>
-        public bool TryConvert(string value, out object result)
+        public bool TryConvert(string value, NumberStyles styles, IFormatProvider provider, out object result)
         {
             bool converted;
 
-            switch (typeName)
+            switch (_typeName)
             {
                 case "Guid":
                     try
@@ -91,48 +102,42 @@
 
                 case "Int32":
                     {
-                        Int32 x;
-                        converted = int.TryParse(value, out x);
+                        converted = int.TryParse(value, styles, provider, out var x);
                         result = x;
                     }
                     break;
 
                 case "Int64":
                     {
-                        Int64 x;
-                        converted = long.TryParse(value, out x);
+                        converted = long.TryParse(value, styles, provider, out var x);
                         result = x;
                     }
                     break;
 
                 case "Single":
                     {
-                        Single x;
-                        converted = float.TryParse(value, out x);
+                        converted = float.TryParse(value, styles, provider, out var x);
                         result = x;
                     }
                     break;
 
                 case "Double":
                     {
-                        Double x;
-                        converted = double.TryParse(value, out x);
+                        converted = double.TryParse(value, styles, provider, out var x);
                         result = x;
                     }
                     break;
 
                 case "Decimal":
                     {
-                        Decimal x;
-                        converted = decimal.TryParse(value, out x);
+                        converted = decimal.TryParse(value, styles, provider, out var x);
                         result = x;
                     }
                     break;
 
                 case "DateTime":
                     {
-                        DateTime x;
-                        converted = DateTime.TryParse(value, out x);
+                        converted = DateTime.TryParse(value, provider, DateTimeStyles.None, out var x);
                         result = x;
                     }
                     break;

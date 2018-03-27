@@ -116,10 +116,15 @@ namespace LumenWorks.Framework.IO.Csv
         /// </summary>
         private string _nullValue;
 
-		/// <summary>
-		/// Indicates if field names are located on the first non commented line.
-		/// </summary>
-		private bool _hasHeaders;
+        /// <summary>
+        /// Which CultureInfo to use for parsing the text in the csv 
+        /// </summary>
+        private CultureInfo _parseCulture;
+
+        /// <summary>
+        /// Indicates if field names are located on the first non commented line.
+        /// </summary>
+        private bool _hasHeaders;
 
 		/// <summary>
 		/// Contains the default action to take when a parsing error has occured.
@@ -301,53 +306,55 @@ namespace LumenWorks.Framework.IO.Csv
 		{
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the CsvReader class.
-		/// </summary>
-		/// <param name="reader">A <see cref="T:TextReader"/> pointing to the CSV file.</param>
-		/// <param name="hasHeaders"><see langword="true"/> if field names are located on the first non commented line, otherwise, <see langword="false"/>.</param>
-		/// <param name="delimiter">The delimiter character separating each field (default is ',').</param>
-		/// <param name="quote">The quotation character wrapping every field (default is ''').</param>
-		/// <param name="escape">
-		/// The escape character letting insert quotation characters inside a quoted field (default is '\').
-		/// If no escape character, set to '\0' to gain some performance.
-		/// </param>
-		/// <param name="comment">The comment character indicating that a line is commented out (default is '#').</param>
-		/// <param name="trimmingOptions">Determines which values should be trimmed.</param>
+        /// <summary>
+        /// Initializes a new instance of the CsvReader class.
+        /// </summary>
+        /// <param name="reader">A <see cref="T:TextReader"/> pointing to the CSV file.</param>
+        /// <param name="hasHeaders"><see langword="true"/> if field names are located on the first non commented line, otherwise, <see langword="false"/>.</param>
+        /// <param name="delimiter">The delimiter character separating each field (default is ',').</param>
+        /// <param name="quote">The quotation character wrapping every field (default is ''').</param>
+        /// <param name="escape">
+        /// The escape character letting insert quotation characters inside a quoted field (default is '\').
+        /// If no escape character, set to '\0' to gain some performance.
+        /// </param>
+        /// <param name="comment">The comment character indicating that a line is commented out (default is '#').</param>
+        /// <param name="trimmingOptions">Determines which values should be trimmed.</param>
         /// <param name="nullValue">The value which denotes a DbNull-value.</param>
+        /// <param name="parseCulture">The culture used to parse the csv file.</param>
         /// <exception cref="T:ArgumentNullException">
-		///		<paramref name="reader"/> is a <see langword="null"/>.
-		/// </exception>
-		/// <exception cref="T:ArgumentException">
-		///		Cannot read from <paramref name="reader"/>.
-		/// </exception>
-        public CsvReader(TextReader reader, bool hasHeaders, char delimiter, char quote, char escape, char comment, ValueTrimmingOptions trimmingOptions, string nullValue = null)
-            : this(reader, hasHeaders, delimiter, quote, escape, comment, trimmingOptions, DefaultBufferSize, nullValue)
+        ///		<paramref name="reader"/> is a <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="T:ArgumentException">
+        ///		Cannot read from <paramref name="reader"/>.
+        /// </exception>
+        public CsvReader(TextReader reader, bool hasHeaders, char delimiter, char quote, char escape, char comment, ValueTrimmingOptions trimmingOptions, string nullValue = null, CultureInfo parseCulture = null)
+            : this(reader, hasHeaders, delimiter, quote, escape, comment, trimmingOptions, DefaultBufferSize, nullValue, parseCulture)
 		{
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the CsvReader class.
-		/// </summary>
-		/// <param name="reader">A <see cref="T:TextReader"/> pointing to the CSV file.</param>
-		/// <param name="hasHeaders"><see langword="true"/> if field names are located on the first non commented line, otherwise, <see langword="false"/>.</param>
-		/// <param name="delimiter">The delimiter character separating each field (default is ',').</param>
-		/// <param name="quote">The quotation character wrapping every field (default is ''').</param>
-		/// <param name="escape">
-		/// The escape character letting insert quotation characters inside a quoted field (default is '\').
-		/// If no escape character, set to '\0' to gain some performance.
-		/// </param>
-		/// <param name="comment">The comment character indicating that a line is commented out (default is '#').</param>
-		/// <param name="trimmingOptions">Determines which values should be trimmed.</param>
-		/// <param name="bufferSize">The buffer size in bytes.</param>
+        /// <summary>
+        /// Initializes a new instance of the CsvReader class.
+        /// </summary>
+        /// <param name="reader">A <see cref="T:TextReader"/> pointing to the CSV file.</param>
+        /// <param name="hasHeaders"><see langword="true"/> if field names are located on the first non commented line, otherwise, <see langword="false"/>.</param>
+        /// <param name="delimiter">The delimiter character separating each field (default is ',').</param>
+        /// <param name="quote">The quotation character wrapping every field (default is ''').</param>
+        /// <param name="escape">
+        /// The escape character letting insert quotation characters inside a quoted field (default is '\').
+        /// If no escape character, set to '\0' to gain some performance.
+        /// </param>
+        /// <param name="comment">The comment character indicating that a line is commented out (default is '#').</param>
+        /// <param name="trimmingOptions">Determines which values should be trimmed.</param>
+        /// <param name="bufferSize">The buffer size in bytes.</param>
         /// <param name="nullValue">The value which denotes a DbNull-value.</param>
+        /// <param name="parseCulture">The Culture used to parse the csv file</param>
         /// <exception cref="T:ArgumentNullException">
-		///		<paramref name="reader"/> is a <see langword="null"/>.
-		/// </exception>
-		/// <exception cref="ArgumentOutOfRangeException">
-		///		<paramref name="bufferSize"/> must be 1 or more.
-		/// </exception>
-		public CsvReader(TextReader reader, bool hasHeaders, char delimiter, char quote, char escape, char comment, ValueTrimmingOptions trimmingOptions, int bufferSize, string nullValue = null)
+        ///		<paramref name="reader"/> is a <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///		<paramref name="bufferSize"/> must be 1 or more.
+        /// </exception>
+        public CsvReader(TextReader reader, bool hasHeaders, char delimiter, char quote, char escape, char comment, ValueTrimmingOptions trimmingOptions, int bufferSize, string nullValue = null, CultureInfo parseCulture = null)
 		{
 #if DEBUG
 			_allocStack = new System.Diagnostics.StackTrace();
@@ -383,6 +390,7 @@ namespace LumenWorks.Framework.IO.Csv
 			_hasHeaders = hasHeaders;
 			_trimmingOptions = trimmingOptions;
             _nullValue = nullValue;
+            _parseCulture = parseCulture ?? CultureInfo.CurrentCulture;
 			_supportsMultiline = true;
 			_skipEmptyLines = true;
 			this.DefaultHeaderName = "Column";
@@ -2111,7 +2119,7 @@ namespace LumenWorks.Framework.IO.Csv
 
 			string value = this[i];
 
-			return Int32.Parse(value ?? string.Empty, CultureInfo.CurrentCulture);
+			return Int32.Parse(value ?? string.Empty, _parseCulture);
 		}
 
 		object IDataRecord.this[string name]
@@ -2170,7 +2178,7 @@ namespace LumenWorks.Framework.IO.Csv
 		byte IDataRecord.GetByte(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return Byte.Parse(this[i], CultureInfo.CurrentCulture);
+			return Byte.Parse(this[i], _parseCulture);
 		}
 
 		Type IDataRecord.GetFieldType(int i)
@@ -2192,7 +2200,7 @@ namespace LumenWorks.Framework.IO.Csv
 		decimal IDataRecord.GetDecimal(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return Decimal.Parse(this[i], CultureInfo.CurrentCulture);
+			return Decimal.Parse(this[i], _parseCulture);
 		}
 
 		int IDataRecord.GetValues(object[] values)
@@ -2233,13 +2241,13 @@ namespace LumenWorks.Framework.IO.Csv
 		long IDataRecord.GetInt64(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return Int64.Parse(this[i], CultureInfo.CurrentCulture);
+			return Int64.Parse(this[i], _parseCulture);
 		}
 
 		double IDataRecord.GetDouble(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return Double.Parse(this[i], CultureInfo.CurrentCulture);
+			return Double.Parse(this[i], _parseCulture);
 		}
 
 		bool IDataRecord.GetBoolean(int i)
@@ -2265,7 +2273,7 @@ namespace LumenWorks.Framework.IO.Csv
 		DateTime IDataRecord.GetDateTime(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return DateTime.Parse(this[i], CultureInfo.CurrentCulture);
+			return DateTime.Parse(this[i], _parseCulture);
 		}
 
 		int IDataRecord.GetOrdinal(string name)
@@ -2290,7 +2298,7 @@ namespace LumenWorks.Framework.IO.Csv
 		float IDataRecord.GetFloat(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return Single.Parse(this[i], CultureInfo.CurrentCulture);
+			return Single.Parse(this[i], _parseCulture);
 		}
 
 		IDataReader IDataRecord.GetData(int i)
@@ -2325,7 +2333,7 @@ namespace LumenWorks.Framework.IO.Csv
 		short IDataRecord.GetInt16(int i)
 		{
 			ValidateDataReader(DataReaderValidations.IsInitialized | DataReaderValidations.IsNotClosed);
-			return Int16.Parse(this[i], CultureInfo.CurrentCulture);
+			return Int16.Parse(this[i], _parseCulture);
 		}
 
 	    object FieldValue(int i)
@@ -2336,7 +2344,7 @@ namespace LumenWorks.Framework.IO.Csv
                 return value;
             }
             var column = Columns[i];
-            return column.Convert(value);
+            return column.Convert(value, _parseCulture);
 	    }
 
 		#endregion
